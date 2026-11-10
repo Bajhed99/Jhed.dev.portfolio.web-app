@@ -1,0 +1,10 @@
+{
+  "$schema": "https://supabase.com/docs/supabase.json",
+  "project_id": "ohczaisjoqcfipsmlrgj",
+  "db": {
+    "schema": ["public"]
+  },
+  "migrations": {
+    "dir": "supabase/migrations"
+  }
+}

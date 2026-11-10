@@ -11,7 +11,7 @@ export default function NewClientPage() {
         ← Back to clients
       </Link>
       <h1 className="mt-2 text-2xl font-bold tracking-tight">New client</h1>
-      <ClientForm mode="create" actionUrl="/api/clients" />
+      <ClientForm mode="create" />
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { useActionState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient, updateClient } from "@/lib/actions/clients";
 
-type ActionState = { id: string } | { error: string } | null;
+type ActionState = { id: string } | { success: true } | { error: string } | null;
 
 interface Props {
   mode: "create" | "edit";
@@ -18,7 +18,7 @@ interface Props {
   }>;
 }
 
-export default function ClientForm({ mode, initial }: Props) {
+export default function ClientForm({ mode, clientId, initial }: Props) {
   const router = useRouter();
   const [state, formAction, pending] = useActionState(
     async (_prev: ActionState, formData: FormData): Promise<ActionState> => {

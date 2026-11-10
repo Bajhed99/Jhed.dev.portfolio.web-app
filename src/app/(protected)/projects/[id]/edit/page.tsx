@@ -39,7 +39,7 @@ export default async function EditProjectPage({
           status: project.status ?? "active",
           startDate: project.start_date ?? "",
           endDate: project.end_date ?? "",
-          budget: project.budget ?? "",
+          budget: project.budget != null ? String(project.budget) : "",
           clientId: project.client_id ?? "",
           visibility: project.visibility,
         }}

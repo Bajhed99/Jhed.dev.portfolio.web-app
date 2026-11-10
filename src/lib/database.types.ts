@@ -1,4 +1,5 @@
-// Hand-written Database types matching supabase/migrations/00000001_initial.sql.
+// Hand-written Database types matching supabase/migrations/00000001_initial.sql
+// and 00000002_task_hierarchy.sql.
 // Regenerate with: npx supabase gen types --lang=ts --schema public > src/lib/database.types.ts
 // when connected to a live project.
 
@@ -44,6 +45,7 @@ export interface Database {
           visibility?: "public" | "private";
           created_at?: string;
         };
+        Relationships: [];
       };
       users: {
         Row: {
@@ -67,6 +69,7 @@ export interface Database {
           client_id?: string | null;
           created_at?: string;
         };
+        Relationships: [];
       };
       projects: {
         Row: {
@@ -108,6 +111,7 @@ export interface Database {
           visibility?: "public" | "private";
           created_at?: string;
         };
+        Relationships: [];
       };
       tasks: {
         Row: {
@@ -119,8 +123,12 @@ export interface Database {
           status: "todo" | "in-progress" | "review" | "done";
           priority: "low" | "medium" | "high";
           due_date: string | null;
-          order: number;
+          parent_id: string | null;
+          tags: string[];
+          estimate_hours: number | null;
+          owner_id: string | null;
           created_at: string;
+          order: number;
         };
         Insert: {
           id?: string;
@@ -131,8 +139,12 @@ export interface Database {
           status?: "todo" | "in-progress" | "review" | "done";
           priority?: "low" | "medium" | "high";
           due_date?: string | null;
-          order?: number;
+          parent_id?: string | null;
+          tags?: string[];
+          estimate_hours?: number | null;
+          owner_id?: string | null;
           created_at?: string;
+          order?: number;
         };
         Update: {
           id?: string;
@@ -143,9 +155,14 @@ export interface Database {
           status?: "todo" | "in-progress" | "review" | "done";
           priority?: "low" | "medium" | "high";
           due_date?: string | null;
-          order?: number;
+          parent_id?: string | null;
+          tags?: string[];
+          estimate_hours?: number | null;
+          owner_id?: string | null;
           created_at?: string;
+          order?: number;
         };
+        Relationships: [];
       };
     };
     Views: {};

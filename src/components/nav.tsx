@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { getCurrentUser, signOut } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth";
+import { signOut } from "@/lib/actions/sign-out";
 
 export default async function Nav() {
   const user = await getCurrentUser();
@@ -13,13 +14,27 @@ export default async function Nav() {
         <div className="flex items-center gap-4 text-sm">
           {user ? (
             <>
+              <Link
+                href="/dashboard"
+                className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+              >
+                Dashboard
+              </Link>
               {user.role === "admin" ? (
-                <Link
-                  href="/clients"
-                  className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-                >
-                  Admin
-                </Link>
+                <>
+                  <Link
+                    href="/clients"
+                    className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                  >
+                    Clients
+                  </Link>
+                  <Link
+                    href="/projects"
+                    className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                  >
+                    Projects
+                  </Link>
+                </>
               ) : null}
               <span className="hidden text-zinc-400 sm:inline">
                 {user.email}

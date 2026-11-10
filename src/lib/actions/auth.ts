@@ -29,5 +29,5 @@ export async function login(
     return { error: error?.message ?? "Invalid email or password" };
   }
 
-  redirect("/clients");
+  redirect("/dashboard");
 }

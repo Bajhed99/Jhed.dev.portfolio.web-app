@@ -1,19 +1,9 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { updateTaskStatus, deleteTask } from "@/lib/actions/tasks";
-import { TaskStatusSelect } from "./task-status-select";
-
-type Task = {
-  id: string;
-  title: string;
-  description: string | null;
-  status: "todo" | "in-progress" | "review" | "done";
-  priority: "low" | "medium" | "high";
-  due_date: string | null;
-  order: number;
-};
+import TaskCard, { type Task } from "./task-card";
 
 const COLUMNS: { key: Task["status"]; label: string }[] = [
   { key: "todo", label: "To do" },
@@ -25,9 +15,11 @@ const COLUMNS: { key: Task["status"]; label: string }[] = [
 export default function TaskBoard({
   projectId,
   tasks,
+  onAddSubtask,
 }: {
   projectId: string;
   tasks: Task[];
+  onAddSubtask?: (parentId: string, parentTitle: string) => void;
 }) {
   const router = useRouter();
   const [local, setLocal] = useState(tasks);
@@ -35,6 +27,16 @@ export default function TaskBoard({
   useEffect(() => {
     setLocal(tasks);
   }, [tasks]);
+
+  // Children grouped by parent_id for nested rendering.
+  const childrenById = new Map<string, Task[]>();
+  for (const t of local) {
+    if (t.parent_id) {
+      const list = childrenById.get(t.parent_id) ?? [];
+      list.push(t);
+      childrenById.set(t.parent_id, list);
+    }
+  }
 
   async function move(taskId: string, status: Task["status"]) {
     const prev = local;
@@ -72,12 +74,12 @@ export default function TaskBoard({
               {col.label}
             </h3>
             <span className="text-xs text-zinc-400">
-              {local.filter((t) => t.status === col.key).length}
+              {local.filter((t) => t.status === col.key && t.parent_id === null).length}
             </span>
           </div>
           <div className="flex flex-col gap-2 px-3 pb-3">
             {local
-              .filter((t) => t.status === col.key)
+              .filter((t) => t.status === col.key && t.parent_id === null)
               .sort((a, b) => a.order - b.order)
               .map((t) => (
                 <TaskCard
@@ -86,66 +88,17 @@ export default function TaskBoard({
                   projectId={projectId}
                   onMove={move}
                   onDelete={remove}
+                  subtasks={childrenById.get(t.id)}
+                  onAddSubtask={
+                    onAddSubtask
+                      ? () => onAddSubtask(t.id, t.title)
+                      : undefined
+                  }
                 />
               ))}
           </div>
         </div>
       ))}
-    </div>
-  );
-}
-
-function TaskCard({
-  task,
-  projectId,
-  onMove,
-  onDelete,
-}: {
-  task: Task;
-  projectId: string;
-  onMove: (id: string, status: Task["status"]) => void;
-  onDelete: (id: string) => void;
-}) {
-  const [open, setOpen] = useState(false);
-
-  const priorityColors: Record<Task["priority"], string> = {
-    low: "text-zinc-400",
-    medium: "text-blue-500",
-    high: "text-red-500",
-  };
-
-  return (
-    <div className="rounded-lg border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900">
-      <div className="flex items-start justify-between gap-2">
-        <h4 className="text-sm font-medium">{task.title}</h4>
-        <span className={`text-xs ${priorityColors[task.priority]}`}>
-          {task.priority}
-        </span>
-      </div>
-      {task.description ? (
-        <p className="mt-1 line-clamp-3 text-xs text-zinc-500">
-          {task.description}
-        </p>
-      ) : null}
-      {task.due_date ? (
-        <p className="mt-2 text-xs text-zinc-400">
-          Due {new Date(task.due_date).toLocaleDateString()}
-        </p>
-      ) : null}
-
-      <div className="mt-3 flex items-center justify-between">
-        <TaskStatusSelect
-          value={task.status}
-          onChange={(s) => onMove(task.id, s)}
-        />
-        <button
-          type="button"
-          onClick={() => onDelete(task.id)}
-          className="text-xs text-zinc-400 hover:text-red-600"
-        >
-          Delete
-        </button>
-      </div>
     </div>
   );
 }

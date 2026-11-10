@@ -40,7 +40,6 @@ export default async function EditClientPage({
           notes: client.notes ?? "",
           visibility: client.visibility,
         }}
-        actionUrl="/api/clients"
       />
     </div>
   );

@@ -1,13 +1,25 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createTask } from "@/lib/actions/tasks";
+import AssigneePicker from "./assignee-picker";
 
-export default function AddTaskForm({ projectId }: { projectId: string }) {
+type TaskFormState = { id?: string; error?: string } | null;
+
+export default function AddTaskForm({
+  projectId,
+  parentId,
+  defaultParentTitle,
+}: {
+  projectId: string;
+  parentId?: string;
+  defaultParentTitle?: string;
+}) {
   const router = useRouter();
+  const [assigneeIds, setAssigneeIds] = useState<string[]>([]);
   const [state, formAction, pending] = useActionState(
-    async (_prev: { error?: string } | null, formData: FormData) =>
+    async (_prev: TaskFormState, formData: FormData): Promise<TaskFormState> =>
       createTask({
         projectId,
         title: (formData.get("title") as string) ?? "",
@@ -16,7 +28,15 @@ export default function AddTaskForm({ projectId }: { projectId: string }) {
         priority:
           (formData.get("priority") as "low" | "medium" | "high") ?? "medium",
         dueDate: (formData.get("dueDate") as string) ?? "",
-        assigneeIds: [],
+        assigneeIds,
+        parentId: (formData.get("parentId") as string) || undefined,
+        tags: (formData.get("tags") as string)
+          ? (formData.get("tags") as string)
+              .split(",")
+              .map((t) => t.trim())
+              .filter(Boolean)
+          : [],
+        estimateHours: Number(formData.get("estimateHours") as string) || undefined,
       }),
     null,
   );
@@ -34,16 +54,22 @@ export default function AddTaskForm({ projectId }: { projectId: string }) {
           htmlFor="title"
           className="mb-1 block text-xs font-medium text-zinc-500"
         >
-          New task
+          {parentId ? "Add subtask" : "New task"}
+          {parentId && defaultParentTitle ? (
+            <span className="ml-1 text-zinc-400">— {defaultParentTitle}</span>
+          ) : null}
         </label>
         <input
           id="title"
           name="title"
           required
-          placeholder="Task title"
+          placeholder={parentId ? "Subtask title" : "Task title"}
           className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950"
         />
       </div>
+      {parentId ? (
+        <input type="hidden" name="parentId" value={parentId} />
+      ) : null}
       <div>
         <label
           htmlFor="priority"
@@ -76,6 +102,42 @@ export default function AddTaskForm({ projectId }: { projectId: string }) {
           type="date"
           className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950"
         />
+      </div>
+      <div>
+        <label
+          htmlFor="estimateHours"
+          className="mb-1 block text-xs font-medium text-zinc-500"
+        >
+          Est. (h)
+        </label>
+        <input
+          id="estimateHours"
+          name="estimateHours"
+          type="number"
+          step="0.5"
+          min="0"
+          className="w-24 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950"
+        />
+      </div>
+      <div>
+        <label
+          htmlFor="tags"
+          className="mb-1 block text-xs font-medium text-zinc-500"
+        >
+          Tags
+        </label>
+        <input
+          id="tags"
+          name="tags"
+          placeholder="backend, urgent"
+          className="w-36 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950"
+        />
+      </div>
+      <div>
+        <label className="mb-1 block text-xs font-medium text-zinc-500">
+          Assignees
+        </label>
+        <AssigneePicker value={assigneeIds} onChange={setAssigneeIds} />
       </div>
       <button
         type="submit"

@@ -43,7 +43,7 @@ async function upsertUser(email, password, role, clientId) {
     password,
     email_confirm: true, // skip confirmation so they can log in right away
   });
-  if (createErr && !createErr.message?.already registered) {
+  if (createErr && !createErr.message?.includes("already registered")) {
     throw createErr;
   }
   const userId = created?.user?.id;

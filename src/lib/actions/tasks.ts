@@ -13,6 +13,9 @@ const TaskSchema = z.object({
   priority: z.enum(["low", "medium", "high"]).default("medium"),
   dueDate: z.string().optional().or(z.literal("")),
   assigneeIds: z.array(z.string()).default([]),
+  parentId: z.string().optional().or(z.null()),
+  tags: z.array(z.string()).default([]),
+  estimateHours: z.number().optional(),
 });
 
 export type TaskInput = z.infer<typeof TaskSchema>;
@@ -39,6 +42,9 @@ export async function createTask(
       priority: parsed.data.priority,
       due_date: parsed.data.dueDate || null,
       assignee_ids: parsed.data.assigneeIds,
+      parent_id: parsed.data.parentId || null,
+      tags: parsed.data.tags,
+      estimate_hours: parsed.data.estimateHours || null,
       owner_id: user.id,
     })
     .select("id")
@@ -68,6 +74,9 @@ export async function updateTask(
       priority: parsed.data.priority,
       due_date: parsed.data.dueDate || null,
       assignee_ids: parsed.data.assigneeIds,
+      parent_id: parsed.data.parentId || null,
+      tags: parsed.data.tags,
+      estimate_hours: parsed.data.estimateHours || null,
     })
     .eq("id", id);
 

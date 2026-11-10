@@ -4,7 +4,7 @@ import { useActionState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createProject, updateProject } from "@/lib/actions/projects";
 
-type ActionState = { id: string } | { error: string } | null;
+type ActionState = { id: string } | { success: true } | { error: string } | null;
 
 interface Props {
   mode: "create" | "edit";
@@ -21,10 +21,11 @@ interface Props {
   }>;
 }
 
-export default function ProjectForm({ mode, initial }: Props) {
+export default function ProjectForm({ mode, projectId, initial }: Props) {
   const router = useRouter();
   const [state, formAction, pending] = useActionState(
     async (_prev: ActionState, formData: FormData): Promise<ActionState> => {
+      const budgetRaw = (formData.get("budget") as string) ?? "";
       const input = {
         title: (formData.get("title") as string) ?? "",
         description: (formData.get("description") as string) ?? "",
@@ -37,7 +38,7 @@ export default function ProjectForm({ mode, initial }: Props) {
             | null) ?? null,
         startDate: (formData.get("startDate") as string) ?? "",
         endDate: (formData.get("endDate") as string) ?? "",
-        budget: (formData.get("budget") as string) ?? "",
+        budget: budgetRaw === "" ? undefined : Number(budgetRaw),
         clientId: (formData.get("clientId") as string) ?? "",
         visibility:
           (formData.get("visibility") as "public" | "private") ?? "private",

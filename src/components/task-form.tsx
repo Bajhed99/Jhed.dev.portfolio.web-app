@@ -1,25 +1,37 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { updateTask } from "@/lib/actions/tasks";
+import AssigneePicker from "./assignee-picker";
 
 type Task = {
   id: string;
-  project_id: string;
+  project_id: string | null;
   title: string;
   description: string | null;
   status: "todo" | "in-progress" | "review" | "done";
   priority: "low" | "medium" | "high";
   due_date: string | null;
+  parent_id: string | null;
+  tags: string[];
+  assignee_ids?: string[];
 };
 
-export default function TaskForm({ task }: { task: Task }) {
+export default function TaskForm({
+  task,
+  siblings = [],
+}: {
+  task: Task;
+  siblings?: { id: string; title: string }[];
+}) {
   const router = useRouter();
+  const projectId = task.project_id ?? "";
+  const [assigneeIds, setAssigneeIds] = useState<string[]>(task.assignee_ids ?? []);
   const [state, formAction, pending] = useActionState(
     async (_prev: { success?: true } | { error?: string } | null, formData: FormData) =>
       updateTask(task.id, {
-        projectId: task.project_id,
+        projectId,
         title: (formData.get("title") as string) ?? "",
         description: (formData.get("description") as string) ?? "",
         status:
@@ -31,7 +43,15 @@ export default function TaskForm({ task }: { task: Task }) {
         priority:
           (formData.get("priority") as "low" | "medium" | "high") ?? "medium",
         dueDate: (formData.get("dueDate") as string) ?? "",
-        assigneeIds: [],
+        assigneeIds,
+        parentId: (formData.get("parentId") as string) ?? "",
+        tags: (formData.get("tags") as string)
+          ? (formData.get("tags") as string)
+              .split(",")
+              .map((t) => t.trim())
+              .filter(Boolean)
+          : [],
+        estimateHours: Number(formData.get("estimateHours") as string) || undefined,
       }),
     null as { success?: true } | { error?: string } | null,
   );
@@ -115,6 +135,58 @@ export default function TaskForm({ task }: { task: Task }) {
           defaultValue={task.due_date ?? ""}
           className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950"
         />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="parentId" className="mb-1 block text-sm font-medium">
+            Parent task (subtask)
+          </label>
+          <select
+            id="parentId"
+            name="parentId"
+            defaultValue={task.parent_id ?? ""}
+            className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950"
+          >
+            <option value="">— None —</option>
+            {siblings.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.title}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="estimateHours" className="mb-1 block text-sm font-medium">
+            Estimate (hours)
+          </label>
+          <input
+            id="estimateHours"
+            name="estimateHours"
+            type="number"
+            step="0.5"
+            min="0"
+            defaultValue=""
+            className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label htmlFor="tags" className="mb-1 block text-sm font-medium">
+          Tags (comma-separated)
+        </label>
+        <input
+          id="tags"
+          name="tags"
+          defaultValue={(task.tags ?? []).join(", ")}
+          placeholder="backend, urgent, design"
+          className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950"
+        />
+      </div>
+      <div>
+        <label className="mb-1 block text-sm font-medium">Assignees</label>
+        <AssigneePicker value={assigneeIds} onChange={setAssigneeIds} />
       </div>
 
       {state && "error" in state && state.error ? (

@@ -2,15 +2,16 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { requireAuth } from "@/lib/auth";
-import TaskBoard from "@/components/task-board";
-import AddTaskForm from "@/components/add-task-form";
+import TaskBoardWrapper from "@/components/task-board-wrapper";
 
 export const revalidate = 0;
 
 export default async function ProjectDetailPage({
   params,
+  searchParams,
 }: {
   params: { id: string };
+  searchParams: { view?: string };
 }) {
   const user = await requireAuth();
   const supabase = await createSupabaseServerClient();
@@ -32,9 +33,32 @@ export default async function ProjectDetailPage({
 
   const { data: tasks } = await supabase
     .from("tasks")
-    .select("id, title, description, status, priority, due_date, order")
+    .select(
+      "id, title, description, status, priority, due_date, order, parent_id, tags, assignee_ids",
+    )
     .eq("project_id", params.id)
     .order("order", { ascending: true });
+
+  const { data: subtasks } = await supabase
+    .from("tasks")
+    .select(
+      "id, title, description, status, priority, due_date, order, parent_id, tags, assignee_ids",
+    )
+    .eq("project_id", params.id)
+    .not("parent_id", "is", null)
+    .order("order", { ascending: true });
+
+  // Build a flat list of all tasks (top-level + subtasks) so the wrapper
+  // can find parent-child relationships, including nested grandchildren.
+  const { data: allTasks } = await supabase
+    .from("tasks")
+    .select(
+      "id, title, description, status, priority, due_date, order, parent_id, tags, assignee_ids",
+    )
+    .eq("project_id", params.id)
+    .order("order", { ascending: true });
+
+  const viewMode = searchParams?.view === "list" ? "list" : "kanban";
 
   return (
     <div>
@@ -111,11 +135,36 @@ export default async function ProjectDetailPage({
       <div className="mt-8">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">Tasks</h2>
-          <AddTaskForm projectId={project.id} />
+          <div className="flex gap-2">
+            <Link
+              href={`/projects/${project.id}?view=list`}
+              className={`text-xs hover:text-zinc-900 dark:hover:text-zinc-100 ${
+                viewMode === "list"
+                  ? "text-zinc-900 dark:text-zinc-100"
+                  : "text-zinc-500"
+              }`}
+            >
+              List
+            </Link>
+            <span className="text-xs text-zinc-300">|</span>
+            <Link
+              href={`/projects/${project.id}`}
+              className={`text-xs hover:text-zinc-900 dark:hover:text-zinc-100 ${
+                viewMode === "kanban"
+                  ? "text-zinc-900 dark:text-zinc-100"
+                  : "text-zinc-500"
+              }`}
+            >
+              Kanban
+            </Link>
+          </div>
         </div>
-        <div className="mt-4">
-          <TaskBoard projectId={project.id} tasks={tasks ?? []} />
-        </div>
+
+        <TaskBoardWrapper
+          projectId={project.id}
+          tasks={allTasks ?? []}
+          viewMode={viewMode as "kanban" | "list"}
+        />
       </div>
     </div>
   );

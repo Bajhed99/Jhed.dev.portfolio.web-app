@@ -65,13 +65,13 @@ export async function requireClientAccess(clientId: string): Promise<SessionUser
 }
 
 /** Sign in with email + password. */
-export async function signIn(email: string, password: string) {
-  const supabase = createSupabaseServerClient();
-  return supabase.auth.signUpWithPassword({ email, password });
+export async function signInWithPassword(email: string, password: string) {
+  const supabase = await createSupabaseServerClient();
+  return supabase.auth.signInWithPassword({ email, password });
 }
 
 export async function signOut() {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   await supabase.auth.signOut();
   redirect("/login");
 }
