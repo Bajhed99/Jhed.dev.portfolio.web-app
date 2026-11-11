@@ -17,7 +17,7 @@ export default async function TaskDetailPage({
   const { data: task } = await supabase
     .from("tasks")
     .select(
-      "id, project_id, title, description, status, priority, due_date, parent_id, tags, assignee_ids",
+      "id, project_id, title, description, status, priority, due_date, parent_id, tags, assignee_ids, estimate_hours",
     )
     .eq("id", params.id)
     .single();
