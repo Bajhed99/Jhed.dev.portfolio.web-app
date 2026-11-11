@@ -94,6 +94,7 @@ function SubtaskRow({
             onMove={onMove}
             onDelete={onDelete}
             onAddSubtask={onAddSubtask}
+            allSubtasks={allSubtasks}
           />
         </div>
       ) : null}
