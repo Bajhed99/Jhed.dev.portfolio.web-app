@@ -91,6 +91,7 @@ export default function TaskKanbanBoard({
                   onMove={move}
                   onDelete={remove}
                   subtasks={childrenById.get(t.id)}
+                  allSubtasks={local}
                   onAddSubtask={
                     onAddSubtask
                       ? () => onAddSubtask(t.id, t.title)
