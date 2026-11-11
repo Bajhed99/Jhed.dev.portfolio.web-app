@@ -25,6 +25,7 @@ type TaskCardProps = {
   onDelete: (id: string) => void;
   /** Subtasks whose parent_id === task.id. Rendered nested under the card. */
   subtasks?: Task[];
+  allSubtasks?: Task[];
   /** Optional: show an "Add subtask" button that opens the add-task form for this parent. */
   onAddSubtask?: (parentId: string) => void;
   /** Label shown next to the title when this task is itself a subtask. */
@@ -43,6 +44,7 @@ export default function TaskCard({
   onMove,
   onDelete,
   subtasks,
+  allSubtasks,
   onAddSubtask,
   parentTitle,
 }: TaskCardProps) {
@@ -131,6 +133,7 @@ export default function TaskCard({
           <div className="mt-2">
             <SubtaskList
               subtasks={subtasks!}
+              allSubtasks={allSubtasks}
               projectId={projectId}
               onMove={onMove}
               onDelete={onDelete}
