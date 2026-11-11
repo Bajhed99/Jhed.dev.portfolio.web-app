@@ -44,7 +44,7 @@ export async function createTask(
       assignee_ids: parsed.data.assigneeIds,
       parent_id: parsed.data.parentId || null,
       tags: parsed.data.tags,
-      estimate_hours: parsed.data.estimateHours || null,
+      estimate_hours: parsed.data.estimateHours ?? null,
       owner_id: user.id,
     })
     .select("id")
