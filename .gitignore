@@ -45,3 +45,5 @@ AGENTS.md
 
 # supabase CLI cache
 /supabase/.temp/
+supabase/seed.mjs
+supabase/seed-data.mjs
