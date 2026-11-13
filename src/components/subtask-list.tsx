@@ -28,6 +28,7 @@ function SubtaskRow({
   onMove,
   onDelete,
   onAddSubtask,
+  allSubtasks,
   children,
 }: {
   subtask: Subtask;
@@ -35,6 +36,7 @@ function SubtaskRow({
   onMove: (id: string, status: Subtask["status"]) => void;
   onDelete: (id: string) => void;
   onAddSubtask?: (parentId: string) => void;
+  allSubtasks: Subtask[];
   children?: Subtask[];
 }) {
   const [open, setOpen] = useState(false);
@@ -139,6 +141,7 @@ export default function SubtaskList({
             onMove={onMove}
             onDelete={onDelete}
             onAddSubtask={onAddSubtask}
+            allSubtasks={allSubtasks}
             children={childrenById.get(s.id)}
           />
         ))}

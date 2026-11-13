@@ -92,7 +92,10 @@ export default function TaskBoard({
                   allSubtasks={local}
                   onAddSubtask={
                     onAddSubtask
-                      ? () => onAddSubtask(t.id, t.title)
+                      ? (parentId) => {
+                        const parent = local.find((item) => item.id === parentId);
+                        if (parent) onAddSubtask(parent.id, parent.title);
+                      }
                       : undefined
                   }
                 />

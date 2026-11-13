@@ -76,7 +76,7 @@ export async function updateTask(
       assignee_ids: parsed.data.assigneeIds,
       parent_id: parsed.data.parentId || null,
       tags: parsed.data.tags,
-      estimate_hours: parsed.data.estimateHours || null,
+      estimate_hours: parsed.data.estimateHours ?? null,
     })
     .eq("id", id);
 

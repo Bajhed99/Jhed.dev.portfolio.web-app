@@ -80,12 +80,11 @@ export default function AddTaskForm({
         <select
           id="priority"
           name="priority"
+          defaultValue="medium"
           className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950"
         >
           <option value="low">Low</option>
-          <option value="medium" selected>
-            Medium
-          </option>
+          <option value="medium">Medium</option>
           <option value="high">High</option>
         </select>
       </div>
