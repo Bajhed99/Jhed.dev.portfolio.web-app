@@ -9,7 +9,7 @@ export default async function EditProjectPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const [{ id }] = await Promise.all([params]);
+  const { id } = await params;
   await requireAdmin();
   const supabase = await createSupabaseServerClient();
   const { data: project } = await supabase
