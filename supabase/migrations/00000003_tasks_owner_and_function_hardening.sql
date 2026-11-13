@@ -36,6 +36,9 @@ create index if not exists projects_owner_id_idx
 create index if not exists tasks_project_id_idx
   on public.tasks(project_id);
 
+create index if not exists tasks_owner_id_idx
+  on public.tasks(owner_id);
+
 create index if not exists users_client_id_idx
   on public.users(client_id);
 
@@ -74,4 +77,10 @@ grant execute on function public.current_user_role() to authenticated;
 
 -- Trigger/event-trigger functions are not intended to be callable as RPCs.
 revoke all on function public.handle_new_user() from public, anon, authenticated;
-revoke all on function public.rls_auto_enable() from public, anon, authenticated;
+do $
+begin
+  if to_regprocedure('public.rls_auto_enable()') is not null then
+    execute 'revoke all on function public.rls_auto_enable() from public, anon, authenticated';
+  end if;
+end
+$;

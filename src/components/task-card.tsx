@@ -137,6 +137,7 @@ export default function TaskCard({
               projectId={projectId}
               onMove={onMove}
               onDelete={onDelete}
+              onAddSubtask={onAddSubtask}
             />
           </div>
         ) : null}

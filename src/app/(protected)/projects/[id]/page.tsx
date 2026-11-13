@@ -10,9 +10,13 @@ export default async function ProjectDetailPage({
   params,
   searchParams,
 }: {
-  params: { id: string };
-  searchParams: { view?: string };
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ view?: string }>;
 }) {
+  const [{ id }, resolvedSearchParams] = await Promise.all([
+    params,
+    searchParams,
+  ]);
   const user = await requireAuth();
   const supabase = await createSupabaseServerClient();
 
@@ -21,7 +25,7 @@ export default async function ProjectDetailPage({
     .select(
       "id, title, description, status, start_date, end_date, budget, client_id, owner_id, visibility",
     )
-    .eq("id", params.id)
+    .eq("id", id)
     .single();
 
   if (!project) notFound();
@@ -31,34 +35,17 @@ export default async function ProjectDetailPage({
     redirect("/projects");
   }
 
-  const { data: tasks } = await supabase
-    .from("tasks")
-    .select(
-      "id, title, description, status, priority, due_date, order, parent_id, tags, assignee_ids",
-    )
-    .eq("project_id", params.id)
-    .order("order", { ascending: true });
-
-  const { data: subtasks } = await supabase
-    .from("tasks")
-    .select(
-      "id, title, description, status, priority, due_date, order, parent_id, tags, assignee_ids",
-    )
-    .eq("project_id", params.id)
-    .not("parent_id", "is", null)
-    .order("order", { ascending: true });
-
-  // Build a flat list of all tasks (top-level + subtasks) so the wrapper
-  // can find parent-child relationships, including nested grandchildren.
+  // Fetch all tasks once so the wrapper can resolve parent-child relationships,
+  // including nested grandchildren.
   const { data: allTasks } = await supabase
     .from("tasks")
     .select(
       "id, title, description, status, priority, due_date, order, parent_id, tags, assignee_ids",
     )
-    .eq("project_id", params.id)
+    .eq("project_id", id)
     .order("order", { ascending: true });
 
-  const viewMode = searchParams?.view === "list" ? "list" : "kanban";
+  const viewMode = resolvedSearchParams.view === "list" ? "list" : "kanban";
 
   return (
     <div>
@@ -163,7 +150,7 @@ export default async function ProjectDetailPage({
         <TaskBoardWrapper
           projectId={project.id}
           tasks={allTasks ?? []}
-          viewMode={viewMode as "kanban" | "list"}
+          viewMode={viewMode}
         />
       </div>
     </div>

@@ -7,14 +7,15 @@ import ProjectForm from "@/components/project-form";
 export default async function EditProjectPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   await requireAdmin();
   const supabase = await createSupabaseServerClient();
   const { data: project } = await supabase
     .from("projects")
     .select("id, title, description, status, start_date, end_date, budget, client_id, visibility")
-    .eq("id", params.id)
+    .eq("id", id)
     .single();
 
   if (!project) notFound();
