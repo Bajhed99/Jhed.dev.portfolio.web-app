@@ -45,6 +45,3 @@ AGENTS.md
 
 # supabase CLI cache
 /supabase/.temp/
-
-# agent session notes
-SESSION.md
