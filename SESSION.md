@@ -44,18 +44,46 @@ Migration 00000004 behavior:
 - Does not grant anonymous SELECT on internal `owner_id`.
 - User confirmed successful execution in Supabase. The actual resulting privileges have not yet been independently verified with read-only SQL checks.
 
-### Next task: verify live Supabase permissions and application access
+### Live Supabase permission and application access verification (COMPLETED 2026-11-14)
 
-Before making any further database changes, perform read-only verification against the live Supabase database:
+Read-only checks were completed against the live Supabase project (`ohczaisjoqcfipsmlrgj`). No database changes, application changes, or data writes were made.
 
-1. Confirm the `anon` role has column-level SELECT on the intended public task columns.
-2. Confirm `anon` does not have SELECT on `public.tasks.owner_id`.
-3. Confirm table-level SELECT has not inadvertently been restored to `anon` or `PUBLIC`.
-4. Confirm authenticated role access remains consistent with the existing RLS model and application requirements.
-5. Confirm relevant RLS policies remain enabled and intact.
-6. Test the public project/showcase and authenticated admin/client task flows without changing data.
+#### Database access results
 
-Do not weaken or replace existing RLS policies. Do not apply another migration unless a verified issue requires it and the user explicitly authorizes the change. Use read-only SQL for the initial verification.
+| Role | Visible projects | Visible tasks | Result |
+|---|---:|---:|---|
+| `anon` | 7 | 11 | Public project/task rows only |
+| `admin` | 7 | 11 | All current projects and their tasks |
+| `client` | 5 | 10 | Client-scoped projects and tasks |
+
+Additional checks:
+- RLS is enabled on `public.projects` and `public.tasks`.
+- Anonymous task SELECT is limited to the approved public columns: `id`, `project_id`, `title`, `description`, `assignee_ids`, `status`, `priority`, `due_date`, `order`, `created_at`, `parent_id`, `tags`, and `estimate_hours`.
+- Anonymous users cannot SELECT `public.tasks.owner_id`.
+- No table-level SELECT grant on `public.tasks` was found for `anon`; no PUBLIC table grants were found on the inspected `tasks` and `projects` tables.
+- The public task policy scopes task visibility through the associated project's public visibility. The current data returned 7 public projects and 11 associated tasks.
+- Authenticated role simulations returned the expected admin and client scoping. `public.current_user_role()` returned the expected role in each simulation.
+- The SQL role simulations used read-only transactions and were rolled back.
+
+#### Database hardening observation
+
+- `anon` currently has table-level INSERT, UPDATE, and DELETE privileges on `public.tasks`, along with column-level write grants. No anonymous INSERT, UPDATE, or DELETE RLS policies were found, so these grants do not currently provide row access through the inspected RLS model. They are nevertheless unnecessary privileges and should be considered for revocation in a separate, explicitly approved hardening change.
+- No permissions were changed during this verification. Do not revoke grants or alter policies without the user's explicit authorization.
+
+#### Application code review
+
+- The protected project detail route requires authentication and scopes client access to the client's own projects. Admin access is broader.
+- Project and client management server actions reviewed enforce admin authorization.
+- Task create/update/delete server actions reviewed enforce admin authorization. A client may encounter an editable-looking task form, but saving invokes an admin-only action; this is a UI/authorization mismatch to address, not evidence that client writes succeeded.
+- The project detail page displays an Edit link to clients even though project editing is intended to be admin-only. Verify the edit route guard before treating this as a security defect; the visible link is at least a UI inconsistency.
+- The public portfolio showcase is sourced from local Markdown files under `content/projects/`, not from the Supabase `projects` table. `src/lib/content.ts` defaults a missing visibility value to `public`; review each content file before publishing it.
+
+#### Verification limits and remaining checks
+
+- The live Supabase migration history table could not be queried at the expected `supabase_migrations.schema_migrations` path. Verification therefore relied on the live schema, grants, RLS policies, and role simulations rather than migration-history records.
+- Actual browser login/session flows were not tested. Admin and client behavior was checked through code review and database role simulation, not an interactive browser session.
+- The public homepage and `/showcase/[slug]` rendering were not browser-tested.
+- Do not treat the anonymous write grants as fixed. They remain a recommended hardening item pending explicit approval.
 
 ## What Was Done This Session (2026-11-11)
 
@@ -119,8 +147,9 @@ The last interrupted-session stub. `assignee_ids` existed in the DB schema and t
 - ❌ No unit tests
 - ❌ No error boundaries / loading states
 - ❌ Tasks restricted to admin role (`requireAdmin`) — client users can't create tasks yet
-- ⚠️ Supabase permission/RLS verification after migration 00000004 is pending
-- ⚠️ Function revoke hardening from the later edited version of migration 00000003 has not been independently verified on the live database
+- ✅ Supabase permission/RLS verification after migration 00000004 completed on 2026-11-14 (see verification section above)
+- ⚠️ Anonymous INSERT/UPDATE/DELETE grants on `public.tasks` remain present and are recommended for revocation after explicit approval
+- ⚠️ The later function-revoke guard from the edited migration 00000003 was not independently verified on the live database
 - ✅ `assignee_ids` — full UI now wired up (was a stub passing `[]`)
 
 ## How to Pick Up
