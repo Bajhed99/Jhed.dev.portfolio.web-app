@@ -11,6 +11,8 @@ const ClientSchema = z.object({
   company: z.string().max(200).optional().or(z.literal("")),
   notes: z.string().max(5000).optional().or(z.literal("")),
   visibility: z.enum(["public", "private"]).default("private"),
+  show_name_publicly: z.boolean().default(false),
+  show_company_publicly: z.boolean().default(false),
 });
 
 export type ClientInput = z.infer<typeof ClientSchema>;
