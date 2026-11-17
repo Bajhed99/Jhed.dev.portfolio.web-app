@@ -53,7 +53,7 @@ export default function ProjectForm({ mode, projectId, initial }: Props) {
 
   useEffect(() => {
     if (state && "id" in state) {
-      router.push(`/projects/${(state as any).id}`);
+      router.push(`/projects/${state.id}`);
     }
   }, [state, router]);
 
