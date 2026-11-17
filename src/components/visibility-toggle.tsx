@@ -19,8 +19,7 @@ export function ClientVisibilityToggle({
 }: VisibilityToggleProps) {
   const router = useRouter();
   const [state, formAction, pending] = useActionState(
-    async (_prev: { success?: true } | { error?: string } | null) =>
-      action(id, visibility === "public" ? "private" : "public"),
+    async () => action(id, visibility === "public" ? "private" : "public"),
     null,
   );
 
