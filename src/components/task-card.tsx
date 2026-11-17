@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import SubtaskList from "./subtask-list";
 import AssigneeAvatars from "./assignee-avatars";
 
@@ -48,7 +47,6 @@ export default function TaskCard({
   onAddSubtask,
   parentTitle,
 }: TaskCardProps) {
-  const [open, setOpen] = useState(false);
   const hasSubtasks = (subtasks?.length ?? 0) > 0;
 
   return (
