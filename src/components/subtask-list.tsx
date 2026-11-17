@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 export type Subtask = {
   id: string;
   title: string;
@@ -29,7 +27,7 @@ function SubtaskRow({
   onDelete,
   onAddSubtask,
   allSubtasks,
-  children,
+  nestedSubtasks,
 }: {
   subtask: Subtask;
   projectId: string;
@@ -37,10 +35,9 @@ function SubtaskRow({
   onDelete: (id: string) => void;
   onAddSubtask?: (parentId: string) => void;
   allSubtasks: Subtask[];
-  children?: Subtask[];
+  nestedSubtasks?: Subtask[];
 }) {
-  const [open, setOpen] = useState(false);
-  const hasChildren = !!children;
+  const hasChildren = (nestedSubtasks?.length ?? 0) > 0;
 
   return (
     <li className="rounded-lg border border-zinc-200 bg-white px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900">
@@ -91,7 +88,7 @@ function SubtaskRow({
       {hasChildren ? (
         <div className="mt-2 pl-2">
           <SubtaskList
-            subtasks={children}
+            subtasks={nestedSubtasks ?? []}
             projectId={projectId}
             onMove={onMove}
             onDelete={onDelete}
@@ -142,7 +139,7 @@ export default function SubtaskList({
             onDelete={onDelete}
             onAddSubtask={onAddSubtask}
             allSubtasks={allSubtasks}
-            children={childrenById.get(s.id)}
+            nestedSubtasks={childrenById.get(s.id)}
           />
         ))}
     </ul>
