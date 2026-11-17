@@ -108,11 +108,11 @@ export interface Database {
           title?: string;
           description?: string | null;
           status?: "active" | "completed" | "on-hold" | "cancelled" | null;
-          start_date?: string;
-          end_date?: string;
+          start_date?: string | null;
+          end_date?: string | null;
           budget?: number | null;
-          client_id?: string;
-          owner_id?: string;
+          client_id?: string | null;
+          owner_id?: string | null;
           visibility?: "public" | "private";
           created_at?: string;
         };
