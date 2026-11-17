@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useOptimistic, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { updateTaskStatus, deleteTask } from "@/lib/actions/tasks";
 import TaskCard, { type Task } from "./task-card";
@@ -14,6 +14,19 @@ const COLUMNS: { key: ColumnStatus; label: string }[] = [
   { key: "done", label: "Done" },
 ];
 
+type TaskUpdate =
+  | { type: "move"; taskId: string; status: ColumnStatus }
+  | { type: "delete"; taskId: string };
+
+function taskReducer(tasks: Task[], update: TaskUpdate): Task[] {
+  if (update.type === "move") {
+    return tasks.map((task) =>
+      task.id === update.taskId ? { ...task, status: update.status } : task,
+    );
+  }
+  return tasks.filter((task) => task.id !== update.taskId);
+}
+
 export default function TaskKanbanBoard({
   projectId,
   tasks,
@@ -24,11 +37,8 @@ export default function TaskKanbanBoard({
   onAddSubtask?: (parentId: string, parentTitle: string) => void;
 }) {
   const router = useRouter();
-  const [local, setLocal] = useState(tasks);
-
-  useEffect(() => {
-    setLocal(tasks);
-  }, [tasks]);
+  const [local, setLocal] = useOptimistic(tasks, taskReducer);
+  const [, startTransition] = useTransition();
 
   // Children grouped by parent_id for nested rendering.
   const childrenById = new Map<string, Task[]>();
@@ -40,28 +50,22 @@ export default function TaskKanbanBoard({
     }
   }
 
-  async function move(taskId: string, status: ColumnStatus) {
-    const prev = local;
-    setLocal((t) =>
-      t.map((x) => (x.id === taskId ? { ...x, status } : x)),
-    );
-    const res = await updateTaskStatus(taskId, status, projectId);
-    if (res && "error" in res) {
-      setLocal(prev);
-    } else {
+  function move(taskId: string, status: ColumnStatus) {
+    startTransition(async () => {
+      setLocal({ type: "move", taskId, status });
+      const res = await updateTaskStatus(taskId, status, projectId);
+      if (res && "error" in res) return;
       router.refresh();
-    }
+    });
   }
 
-  async function remove(taskId: string) {
-    const prev = local;
-    setLocal((t) => t.filter((x) => x.id !== taskId));
-    const res = await deleteTask(taskId, projectId);
-    if (res && "error" in res) {
-      setLocal(prev);
-    } else {
+  function remove(taskId: string) {
+    startTransition(async () => {
+      setLocal({ type: "delete", taskId });
+      const res = await deleteTask(taskId, projectId);
+      if (res && "error" in res) return;
       router.refresh();
-    }
+    });
   }
 
   return (
