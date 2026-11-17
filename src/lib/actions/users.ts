@@ -20,7 +20,7 @@ export type AssignableUser = {
 export async function getAssignableUsers(): Promise<
   { users: AssignableUser[] } | { error: string }
 > {
-  const user = await requireAuth();
+  await requireAuth();
   const supabase = await createSupabaseServerClient();
 
   const { data, error } = await supabase
