@@ -1,19 +1,11 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { login } from "@/lib/actions/auth";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [state, formAction, pending] = useActionState(login, null);
-
-  useEffect(() => {
-    if (state?.error) {
-      // keep the form mounted so the error can render
-    }
-  }, [state]);
 
   return (
     <main className="mx-auto flex max-w-sm flex-1 flex-col justify-center px-6 py-16">
