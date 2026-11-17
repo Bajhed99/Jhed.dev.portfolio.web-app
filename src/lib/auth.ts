@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "./supabase";
-import type { Database } from "./database.types";
 
 export type AppRole = "admin" | "client";
 
