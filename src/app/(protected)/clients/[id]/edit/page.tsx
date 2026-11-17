@@ -1,22 +1,23 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase";
-import { requireClientAccess } from "@/lib/auth";
+import { requireAdmin } from "@/lib/auth";
 import ClientForm from "@/components/client-form";
 
 export default async function EditClientPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  await requireClientAccess(params.id);
+  const { id } = await params;
+  await requireAdmin();
   const supabase = await createSupabaseServerClient();
   const { data: client } = await supabase
     .from("clients")
     .select(
       "id, name, company, email, notes, visibility, show_name_publicly, show_company_publicly",
     )
-    .eq("id", params.id)
+    .eq("id", id)
     .single();
 
   if (!client) notFound();
