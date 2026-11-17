@@ -15,6 +15,8 @@ interface Props {
     email: string;
     notes: string;
     visibility: "public" | "private";
+    show_name_publicly: boolean;
+    show_company_publicly: boolean;
   }>;
 }
 
@@ -29,6 +31,8 @@ export default function ClientForm({ mode, clientId, initial }: Props) {
         notes: (formData.get("notes") as string) ?? "",
         visibility:
           (formData.get("visibility") as "public" | "private") ?? "private",
+        show_name_publicly: formData.get("show_name_publicly") === "on",
+        show_company_publicly: formData.get("show_company_publicly") === "on",
       };
       if (mode === "create") {
         return createClient(input);
@@ -39,7 +43,7 @@ export default function ClientForm({ mode, clientId, initial }: Props) {
   );
 
   useEffect(() => {
-    if (state && "id" in state) {
+    if (state && ("id" in state || "success" in state)) {
       router.push("/clients");
     }
   }, [state, router]);
@@ -99,7 +103,7 @@ export default function ClientForm({ mode, clientId, initial }: Props) {
 
       <div>
         <label htmlFor="visibility" className="mb-1 block text-sm font-medium">
-          Visibility
+          Client record visibility
         </label>
         <select
           id="visibility"
@@ -110,7 +114,46 @@ export default function ClientForm({ mode, clientId, initial }: Props) {
           <option value="private">Private</option>
           <option value="public">Public</option>
         </select>
+        <p className="mt-1 text-xs text-zinc-500">
+          Only public client records can be considered for public portfolio display.
+        </p>
       </div>
+
+      <fieldset className="space-y-3 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
+        <legend className="px-1 text-sm font-medium">Public display preferences</legend>
+        <p className="text-sm text-zinc-500">
+          Choose which client details may appear on your public portfolio. Both are
+          disabled by default.
+        </p>
+        <label className="flex items-start gap-3 text-sm">
+          <input
+            type="checkbox"
+            name="show_name_publicly"
+            defaultChecked={initial?.show_name_publicly ?? false}
+            className="mt-0.5 h-4 w-4 rounded border-zinc-300"
+          />
+          <span>
+            <span className="block font-medium">Show client name publicly</span>
+            <span className="text-xs text-zinc-500">
+              Allows the client's name to appear on public project pages.
+            </span>
+          </span>
+        </label>
+        <label className="flex items-start gap-3 text-sm">
+          <input
+            type="checkbox"
+            name="show_company_publicly"
+            defaultChecked={initial?.show_company_publicly ?? false}
+            className="mt-0.5 h-4 w-4 rounded border-zinc-300"
+          />
+          <span>
+            <span className="block font-medium">Show company name publicly</span>
+            <span className="text-xs text-zinc-500">
+              Allows the company name to appear on public project pages.
+            </span>
+          </span>
+        </label>
+      </fieldset>
 
       {state && "error" in state && state.error ? (
         <p className="text-sm text-red-600 dark:text-red-400">{state.error}</p>
