@@ -13,7 +13,9 @@ export default async function EditClientPage({
   const supabase = await createSupabaseServerClient();
   const { data: client } = await supabase
     .from("clients")
-    .select("id, name, company, email, notes, visibility")
+    .select(
+      "id, name, company, email, notes, visibility, show_name_publicly, show_company_publicly",
+    )
     .eq("id", params.id)
     .single();
 
@@ -39,6 +41,8 @@ export default async function EditClientPage({
           email: client.email ?? "",
           notes: client.notes ?? "",
           visibility: client.visibility,
+          show_name_publicly: client.show_name_publicly,
+          show_company_publicly: client.show_company_publicly,
         }}
       />
     </div>
