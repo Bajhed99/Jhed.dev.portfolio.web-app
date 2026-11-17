@@ -1,5 +1,4 @@
-// Hand-written Database types matching supabase/migrations/00000001_initial.sql
-// and 00000002_task_hierarchy.sql.
+// Hand-written Database types matching the current Supabase public schema.
 // Regenerate with: npx supabase gen types --lang=ts --schema public > src/lib/database.types.ts
 // when connected to a live project.
 
@@ -23,6 +22,8 @@ export interface Database {
           notes: string | null;
           owner_id: string | null;
           visibility: "public" | "private";
+          show_name_publicly: boolean;
+          show_company_publicly: boolean;
           created_at: string;
         };
         Insert: {
@@ -33,6 +34,8 @@ export interface Database {
           notes?: string | null;
           owner_id?: string | null;
           visibility?: "public" | "private";
+          show_name_publicly?: boolean;
+          show_company_publicly?: boolean;
           created_at?: string;
         };
         Update: {
@@ -43,6 +46,8 @@ export interface Database {
           notes?: string | null;
           owner_id?: string | null;
           visibility?: "public" | "private";
+          show_name_publicly?: boolean;
+          show_company_publicly?: boolean;
           created_at?: string;
         };
         Relationships: [];
@@ -103,11 +108,11 @@ export interface Database {
           title?: string;
           description?: string | null;
           status?: "active" | "completed" | "on-hold" | "cancelled" | null;
-          start_date?: string | null;
-          end_date?: string | null;
+          start_date?: string;
+          end_date?: string;
           budget?: number | null;
-          client_id?: string | null;
-          owner_id?: string | null;
+          client_id?: string;
+          owner_id?: string;
           visibility?: "public" | "private";
           created_at?: string;
         };
@@ -165,7 +170,16 @@ export interface Database {
         Relationships: [];
       };
     };
-    Views: {};
+    Views: {
+      public_clients: {
+        Row: {
+          id: string;
+          name: string | null;
+          company: string | null;
+        };
+        Relationships: [];
+      };
+    };
     Functions: {
       current_user_role: {
         Args: {};
