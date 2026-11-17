@@ -182,11 +182,11 @@ export interface Database {
     };
     Functions: {
       current_user_role: {
-        Args: {};
+        Args: Record<string, never>;
         Returns: string;
       };
     };
-    Enums: {};
-    CompositeTypes: {};
+    Enums: Record<string, never>;
+    CompositeTypes: Record<string, never>;
   };
 }
