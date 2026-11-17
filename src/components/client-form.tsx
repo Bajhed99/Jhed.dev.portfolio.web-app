@@ -135,7 +135,7 @@ export default function ClientForm({ mode, clientId, initial }: Props) {
           <span>
             <span className="block font-medium">Show client name publicly</span>
             <span className="text-xs text-zinc-500">
-              Allows the client's name to appear on public project pages.
+              Allows the client&apos;s name to appear on public project pages.
             </span>
           </span>
         </label>
