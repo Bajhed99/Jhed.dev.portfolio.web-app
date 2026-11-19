@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Markdown from "react-markdown";
 import { notFound } from "next/navigation";
 import Nav from "@/components/nav";
 import { getPublishedShowcaseProject } from "@/lib/showcase";
@@ -107,8 +108,8 @@ export default async function ShowcasePage({ params }: Props) {
 
           {project.content_markdown ? (
             <section className="mt-8">
-              <div className="prose prose-zinc max-w-none whitespace-pre-wrap dark:prose-invert">
-                {project.content_markdown}
+              <div className="max-w-none space-y-4 text-zinc-700 dark:text-zinc-300 [&_h1]:mt-8 [&_h1]:text-3xl [&_h1]:font-bold [&_h1]:tracking-tight [&_h1]:text-zinc-950 [&_h2]:mt-7 [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:tracking-tight [&_h2]:text-zinc-950 [&_h3]:mt-6 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-zinc-950 [&_p]:leading-7 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:space-y-2 [&_ol]:pl-6 [&_li]:pl-1 [&_a]:font-medium [&_a]:text-blue-600 [&_a]:underline [&_a]:underline-offset-4 [&_blockquote]:border-l-4 [&_blockquote]:border-zinc-300 [&_blockquote]:pl-4 [&_blockquote]:italic [&_strong]:font-semibold [&_strong]:text-zinc-950 [&_hr]:border-zinc-200 [&_code]:rounded [&_code]:bg-zinc-100 [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-sm [&_pre]:overflow-x-auto [&_pre]:rounded-lg [&_pre]:bg-zinc-900 [&_pre]:p-4 [&_pre]:text-zinc-100 dark:[&_h1]:text-zinc-100 dark:[&_h2]:text-zinc-100 dark:[&_h3]:text-zinc-100 dark:[&_strong]:text-zinc-100 dark:[&_a]:text-blue-400 dark:[&_code]:bg-zinc-800">
+                <Markdown>{project.content_markdown}</Markdown>
               </div>
             </section>
           ) : null}
