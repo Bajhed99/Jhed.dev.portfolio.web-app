@@ -12,12 +12,10 @@ type InitialData = Omit<ShowcaseInput, "projectId">;
 
 export default function ShowcaseForm({
   projectId,
-  projectTitle,
   published,
   initial,
 }: {
   projectId: string;
-  projectTitle: string;
   published: boolean;
   initial: InitialData;
 }) {
