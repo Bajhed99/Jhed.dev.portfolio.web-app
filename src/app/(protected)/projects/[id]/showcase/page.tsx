@@ -41,7 +41,6 @@ export default async function ProjectShowcaseEditorPage({
 
       <ShowcaseForm
         projectId={project.id}
-        projectTitle={project.title}
         published={project.showcase_published}
         initial={{
           slug: showcase?.slug ?? "",
