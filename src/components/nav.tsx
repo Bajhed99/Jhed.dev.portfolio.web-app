@@ -11,7 +11,7 @@ export default async function Nav() {
         <Link href="/" className="text-lg font-semibold tracking-tight">
           jhed.dev
         </Link>
-        <div className="flex items-center gap-4 text-sm">
+        <div className="flex items-center gap-4 text-sm">\n          <Link href="/" className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100">Showcase</Link>
           {user ? (
             <>
               <Link
