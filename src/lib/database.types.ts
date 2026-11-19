@@ -88,6 +88,7 @@ export interface Database {
           client_id: string | null;
           owner_id: string | null;
           visibility: "public" | "private";
+          showcase_published: boolean;
           created_at: string;
         };
         Insert: {
@@ -101,6 +102,7 @@ export interface Database {
           client_id?: string | null;
           owner_id?: string | null;
           visibility?: "public" | "private";
+          showcase_published?: boolean;
           created_at?: string;
         };
         Update: {
@@ -114,7 +116,29 @@ export interface Database {
           client_id?: string | null;
           owner_id?: string | null;
           visibility?: "public" | "private";
+          showcase_published?: boolean;
           created_at?: string;
+        };
+        Relationships: [];
+      };
+      project_showcases: {
+        Row: {
+          project_id: string; slug: string; cover_image_url: string | null; gallery_images: string[];
+          technologies: string[]; services: string[]; challenge: string | null; solution: string | null;
+          outcomes: string | null; content_markdown: string | null; external_links: Json;
+          seo_title: string | null; seo_description: string | null; updated_at: string;
+        };
+        Insert: {
+          project_id: string; slug: string; cover_image_url?: string | null; gallery_images?: string[];
+          technologies?: string[]; services?: string[]; challenge?: string | null; solution?: string | null;
+          outcomes?: string | null; content_markdown?: string | null; external_links?: Json;
+          seo_title?: string | null; seo_description?: string | null; updated_at?: string;
+        };
+        Update: {
+          project_id?: string; slug?: string; cover_image_url?: string | null; gallery_images?: string[];
+          technologies?: string[]; services?: string[]; challenge?: string | null; solution?: string | null;
+          outcomes?: string | null; content_markdown?: string | null; external_links?: Json;
+          seo_title?: string | null; seo_description?: string | null; updated_at?: string;
         };
         Relationships: [];
       };
@@ -171,6 +195,17 @@ export interface Database {
       };
     };
     Views: {
+      public_projects: {
+        Row: {
+          id: string; title: string; description: string | null;
+          status: "active" | "completed" | "on-hold" | "cancelled" | null;
+          start_date: string | null; end_date: string | null; client_name: string | null; client_company: string | null;
+          slug: string; cover_image_url: string | null; gallery_images: string[]; technologies: string[]; services: string[];
+          challenge: string | null; solution: string | null; outcomes: string | null; content_markdown: string | null;
+          external_links: Json; seo_title: string | null; seo_description: string | null;
+        };
+        Relationships: [];
+      };
       public_clients: {
         Row: {
           id: string;
