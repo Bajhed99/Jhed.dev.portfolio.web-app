@@ -1,10 +1,9 @@
 import Link from "next/link";
-import { getShowcaseProjects } from "@/lib/content";
+import { getPublishedShowcaseProjects } from "@/lib/showcase";
 import Nav from "@/components/nav";
 
 export default async function Home() {
-  const projects = await getShowcaseProjects();
-  const publicProjects = projects.filter((p) => p.visibility === "public");
+  const projects = await getPublishedShowcaseProjects();
 
   return (
     <>
@@ -16,35 +15,28 @@ export default async function Home() {
               Work I ship.
             </h1>
             <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-400">
-              Client engagements, project delivery, and web work. Some projects are
-              public; others are shared privately with the client.
+              Client engagements, project delivery, and web work. Each case study
+              highlights the challenge, approach, and outcome.
             </p>
           </div>
 
-          {publicProjects.length === 0 ? (
+          {projects.length === 0 ? (
             <div className="mt-16 rounded-xl border border-dashed border-zinc-300 p-12 text-center dark:border-zinc-700">
-              <p className="text-zinc-500">
-                No public projects yet. Showcase entries are added as markdown files
-                under{" "}
-                <code className="rounded bg-zinc-100 px-1.5 py-0.5 dark:bg-zinc-800">
-                  content/projects/
-                </code>
-                .
-              </p>
+              <p className="text-zinc-500">No published projects yet.</p>
             </div>
           ) : (
             <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {publicProjects.map((project) => (
+              {projects.map((project) => (
                 <Link
-                  key={project.slug}
+                  key={project.id}
                   href={`/showcase/${project.slug}`}
                   className="group flex flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white transition hover:border-zinc-400 hover:shadow-sm dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-600"
                 >
                   <div className="aspect-video bg-zinc-100 dark:bg-zinc-900">
-                    {project.images[0] ? (
+                    {project.cover_image_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
-                        src={project.images[0]}
+                        src={project.cover_image_url}
                         alt={project.title}
                         className="h-full w-full object-cover"
                       />
@@ -54,23 +46,25 @@ export default async function Home() {
                     <h2 className="text-lg font-semibold group-hover:underline">
                       {project.title}
                     </h2>
-                    {project.client ? (
+                    {project.client_company || project.client_name ? (
                       <p className="text-sm text-zinc-500">
-                        {project.client}
-                        {project.year ? ` · ${project.year}` : ""}
+                        {project.client_company || project.client_name}
+                        {project.start_date
+                          ? ` · ${new Date(project.start_date).getFullYear()}`
+                          : ""}
                       </p>
                     ) : null}
                     <p className="mt-2 line-clamp-3 text-sm text-zinc-600 dark:text-zinc-400">
-                      {project.description}
+                      {project.description || project.challenge || project.solution || ""}
                     </p>
-                    {project.tags.length > 0 ? (
+                    {project.technologies.length > 0 ? (
                       <div className="mt-3 flex flex-wrap gap-1.5">
-                        {project.tags.map((tag) => (
+                        {project.technologies.map((technology) => (
                           <span
-                            key={tag}
+                            key={technology}
                             className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
                           >
-                            {tag}
+                            {technology}
                           </span>
                         ))}
                       </div>
