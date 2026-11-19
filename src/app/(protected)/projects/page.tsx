@@ -13,7 +13,7 @@ export default async function ProjectsPage() {
   const { data: projects } = await supabase
     .from("projects")
     .select(
-      "id, title, status, visibility, client_id, start_date, end_date, budget",
+      "id, title, status, visibility, client_id, start_date, end_date, budget, showcase_published",
     )
     .order("created_at", { ascending: false });
 
@@ -23,7 +23,7 @@ export default async function ProjectsPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Projects</h1>
           <p className="text-sm text-zinc-500">
-            Managed engagements. Public projects appear on the portfolio.
+            Manage project visibility and portfolio publication separately.
           </p>
         </div>
         <Link
@@ -43,7 +43,8 @@ export default async function ProjectsPage() {
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Timeline</th>
                 <th className="px-4 py-3">Budget</th>
-                <th className="px-4 py-3">Visibility</th>
+                <th className="px-4 py-3">Client visibility</th>
+                <th className="px-4 py-3">Portfolio</th>
                 <th className="px-4 py-3 text-right">Actions</th>
               </tr>
             </thead>
@@ -75,13 +76,24 @@ export default async function ProjectsPage() {
                       action={toggleProjectVisibility}
                     />
                   </td>
+                  <td className="px-4 py-3">
+                    <ShowcaseStatus published={p.showcase_published} />
+                  </td>
                   <td className="px-4 py-3 text-right">
-                    <Link
-                      href={`/projects/${p.id}/edit`}
-                      className="text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
-                    >
-                      Edit
-                    </Link>
+                    <div className="inline-flex items-center gap-3">
+                      <Link
+                        href={`/projects/${p.id}/showcase`}
+                        className="font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+                      >
+                        Showcase
+                      </Link>
+                      <Link
+                        href={`/projects/${p.id}/edit`}
+                        className="text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
+                      >
+                        Edit
+                      </Link>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -94,6 +106,20 @@ export default async function ProjectsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+function ShowcaseStatus({ published }: { published: boolean | null }) {
+  return (
+    <span
+      className={
+        published
+          ? "rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/40 dark:text-green-300"
+          : "rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
+      }
+    >
+      {published ? "Published" : "Unpublished"}
+    </span>
   );
 }
 
