@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   saveProjectShowcase,
   setShowcasePublished,
@@ -84,7 +85,7 @@ export default function ShowcaseForm({
       <section className="rounded-xl border border-zinc-200 p-5 dark:border-zinc-800">
         <h2 className="text-lg font-semibold">Publication</h2>
         <p className="mt-1 text-sm text-zinc-500">
-          Publication is separate from the project's CRM visibility setting.
+          Publication is separate from the project&apos;s CRM visibility setting.
         </p>
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <span className={published ? "rounded-full bg-green-100 px-2 py-1 text-xs text-green-800" : "rounded-full bg-zinc-100 px-2 py-1 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"}>
@@ -137,7 +138,7 @@ export default function ShowcaseForm({
         <button type="submit" disabled={saving || publishing} className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-black">
           {saving ? "Saving…" : "Save showcase"}
         </button>
-        <a href="/" className="rounded-md border border-zinc-300 px-4 py-2 text-sm dark:border-zinc-700">View portfolio</a>
+        <Link href="/" className="rounded-md border border-zinc-300 px-4 py-2 text-sm dark:border-zinc-700">View portfolio</Link>
       </div>
     </form>
   );
