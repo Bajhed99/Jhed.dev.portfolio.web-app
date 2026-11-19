@@ -23,7 +23,7 @@ export default async function ProjectDetailPage({
   const { data: project } = await supabase
     .from("projects")
     .select(
-      "id, title, description, status, start_date, end_date, budget, client_id, owner_id, visibility",
+      "id, title, description, status, start_date, end_date, budget, client_id, owner_id, visibility, showcase_published",
     )
     .eq("id", id)
     .single();
@@ -79,8 +79,16 @@ export default async function ProjectDetailPage({
           >
             {project.status?.replace("-", " ")}
           </span>
+          {user.role === "admin" ? (
+            <Link
+              href={`/projects/${project.id}/showcase`}
+              className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-900"
+            >
+              Portfolio showcase
+            </Link>
+          ) : null}
           <Link
-            href={`/projects/${project.id}/edit`}
+            href={`/projects/${project.id}/edit`
             className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-900"
           >
             Edit
